@@ -456,6 +456,14 @@ def build_html(tasks, hoje, out_path, titulo, nivel_as, resumo_anterior, overrid
 
     corpo_grupos = "".join(blocos_grupos)
     corpo_resumo = "".join(cards_resumo)
+
+    # Resumo por PROJETO (AS) -- diferente das contagens acima, que são por
+    # TAREFA. Aqui cada AS conta uma vez só, usando o % geral da própria AS
+    # (o mesmo pct_medio mostrado no card dela) para decidir se está
+    # concluída ou ainda em andamento.
+    total_as = len(grupos)
+    as_concluidos = sum(1 for st in stats_por_grupo.values() if st["pct_medio"] >= 100)
+    as_em_andamento = total_as - as_concluidos
     aviso_comparacao = "" if houve_comparacao else """<div class="aviso">Primeira execução — ainda não há um envio anterior para comparar. A partir do próximo cronograma recebido, o dashboard vai mostrar o % e as atrasadas anteriores.</div>"""
 
     html = f"""<!DOCTYPE html>
@@ -537,6 +545,9 @@ def build_html(tasks, hoje, out_path, titulo, nivel_as, resumo_anterior, overrid
   .legenda-valor {{ font-family:'IBM Plex Mono', monospace; color:var(--texto); font-weight:500; margin-left:2px; }}
   .topo-flex {{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; }}
   .as-donut {{ flex-shrink:0; }}
+  .kpis-grupo {{ display:flex; flex-direction:column; gap:6px; }}
+  .kpis-grupo-titulo {{ font-size:10.5px; color:var(--texto-3); text-transform:uppercase; letter-spacing:0.6px; font-weight:600; }}
+  .kpis-separador {{ width:1px; align-self:stretch; background:var(--borda); }}
 </style>
 </head>
 <body>
@@ -547,11 +558,22 @@ def build_html(tasks, hoje, out_path, titulo, nivel_as, resumo_anterior, overrid
     </div>
     <div class="topo-flex">
       {donut_geral}
-      <div class="kpis">
+      <div class="kpis-grupo">
+        <div class="kpis-grupo-titulo">Projetos (AS)</div>
+        <div class="kpis">
+          <div class="kpi"><span class="valor" style="color:var(--ok);">{as_concluidos}</span><span class="rotulo">Concluídos</span></div>
+          <div class="kpi"><span class="valor" style="color:var(--andamento);">{as_em_andamento}</span><span class="rotulo">Em andamento</span></div>
+        </div>
+      </div>
+      <div class="kpis-separador"></div>
+      <div class="kpis-grupo">
+        <div class="kpis-grupo-titulo">Tarefas</div>
+        <div class="kpis">
         <div class="kpi"><span class="valor">{pct_geral}%</span><span class="rotulo">Progresso</span></div>
         <div class="kpi"><span class="valor" style="color:var(--alto);">{atrasadas_geral}</span><span class="rotulo">Atrasadas</span></div>
         <div class="kpi"><span class="valor" style="color:var(--andamento);">{andamento_geral}</span><span class="rotulo">Em andamento</span></div>
         <div class="kpi"><span class="valor" style="color:var(--ok);">{concluidas_geral}</span><span class="rotulo">Concluídas</span></div>
+        </div>
       </div>
     </div>
   </div>
