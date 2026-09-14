@@ -30,16 +30,34 @@ igual.
 2. Em [share.streamlit.io](https://share.streamlit.io), clique em **New
    app**, escolha esse repositório, o branch e `app.py` como arquivo
    principal.
-3. Depois de criado, vá em **Settings → Secrets** do app e adicione:
+
+   ⚠️ **Importante:** o Streamlit Community Cloud gratuito só permite **um
+   app privado por workspace** — e essa vaga já está ocupada pelo app do
+   "Programa Térmicas". Ao criar este app novo, deixe-o como **público**
+   (não marque "Make this app private"). Isso não expõe os dados: o app
+   tem uma senha de acesso própria (configurada no passo 3) que bloqueia
+   *todo* o conteúdo, não só o upload — então o link é tecnicamente
+   público, mas ninguém vê nada sem a senha.
+3. Depois de criado, vá em **Settings → Secrets** do app e adicione as
+   **duas** senhas:
 
    ```toml
-   admin_password = "escolha-uma-senha-aqui"
+   access_password = "senha-para-quem-so-vai-consultar"
+   admin_password = "senha-para-quem-vai-enviar-cronogramas-novos"
    ```
 
-   É a mesma senha que vai digitar em "🔒 Sou responsável pela atualização"
-   na barra lateral, para poder enviar novos cronogramas.
-4. Pronto — o link do app pode ser compartilhado com quem só for consultar
-   (eles não verão a opção de upload, a menos que também tenham a senha).
+   - `access_password` é pedida a **qualquer pessoa** que abrir o link,
+     antes de ver qualquer painel — é a que protege o conteúdo por causa do
+     app ser público no Streamlit.
+   - `admin_password` é a mesma senha que você já usa hoje no app das
+     térmicas: só quem digitar ela em "🔒 Sou responsável pela atualização"
+     na barra lateral consegue enviar cronogramas novos.
+
+   Podem ser senhas diferentes ou iguais — mas se forem iguais, quem só
+   consulta acaba com a mesma senha de quem administra, então o mais seguro
+   é usar senhas diferentes e só passar a `access_password` para quem
+   precisa consultar.
+4. Pronto — compartilhe o link só com quem tiver a `access_password`.
 
 ## Onde os dados ficam salvos
 

@@ -116,7 +116,11 @@ def load_tasks(xml_path, nivel_as):
         nome = g("Name").strip()
 
         if nivel == nivel_as:
-            grupo_atual = nome
+            # Alguns cronogramas trazem linhas em branco (sem nome) no nível
+            # de AS -- costumam ser marcadores/separadores sem conteudo real.
+            # Tratamos como "sem grupo" em vez de criar um card fantasma ou
+            # de deixar a tarefa colada no AS anterior por engano.
+            grupo_atual = nome if nome else None
             macro_atual = None
         elif nivel == nivel_as + 1:
             macro_atual = nome

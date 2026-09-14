@@ -70,8 +70,10 @@ def carregar_tasks_raw(caminho_tasks, caminho_data_ref):
 
 
 def nome_curto(nome_completo):
-    """Remove o prefixo tecnico 'AS-XXX - NNNNN - ' deixando so a parte descritiva."""
-    m = re.match(r"^AS-\d+\s*-\s*\d+\s*-\s*(.+)$", nome_completo)
+    """Remove o prefixo tecnico 'AS-XXX - NNNNN - ' (ou variações — com/sem
+    hífen colado, espaço antes do número, en-dash '–', ou sem o segundo
+    código) deixando só a parte descritiva."""
+    m = re.match(r"^AS\s*-?\s*\d+\s*[-–]\s*(?:\d+\s*[-–]\s*)?(.+)$", nome_completo)
     return m.group(1).strip() if m else nome_completo
 
 
@@ -87,6 +89,32 @@ def ler_meta(caminho):
             return f.read()
     return None
 
+
+def exigir_senha_de_acesso():
+    """Bloqueia TODO o conteúdo do app (não só o upload) até digitar a senha
+    de acesso. Existe porque o Streamlit Community Cloud gratuito só permite
+    um app privado por workspace — este app fica com o link tecnicamente
+    público, mas ninguém vê nenhum dado de projeto sem essa senha.
+    """
+    if st.session_state.get("tem_acesso"):
+        return
+    st.title(f"📊 {TITULO}")
+    st.caption("Este painel tem dados de projetos e é restrito. Informe a senha de acesso para continuar.")
+    senha_digitada = st.text_input("Senha de acesso", type="password")
+    if st.button("Entrar"):
+        try:
+            senha_correta = st.secrets.get("access_password", None)
+        except Exception:
+            senha_correta = None
+        if senha_correta and senha_digitada == senha_correta:
+            st.session_state["tem_acesso"] = True
+            st.rerun()
+        else:
+            st.error("Senha incorreta.")
+    st.stop()
+
+
+exigir_senha_de_acesso()
 
 st.title(f"📊 {TITULO}")
 st.caption(
